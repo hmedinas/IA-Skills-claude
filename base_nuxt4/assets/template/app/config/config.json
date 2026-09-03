@@ -1,0 +1,35 @@
+{
+    "configuration": {
+        "useMock": true,
+        "useMockUser": true,
+        "version": "0.0.1",
+        "settingColor": true,
+        "nameApplication": "__APP_NAME__",
+        "isMantenimiento": false,
+        "toolsView": true,
+        "viewLogin": false
+    },
+    "devServer": {
+        "port": 3000
+    },
+    "development": {
+        "urlService": "http://localhost:5000/api",
+        "isActiveConsole": true,
+        "pathGlobal": "/"
+    },
+    "staging": {
+        "urlService": "https://staging.example.com/api",
+        "isActiveConsole": true,
+        "pathGlobal": "/"
+    },
+    "preproduction": {
+        "urlService": "https://preprod.example.com/api",
+        "isActiveConsole": true,
+        "pathGlobal": "/"
+    },
+    "production": {
+        "urlService": "https://api.example.com/api",
+        "isActiveConsole": false,
+        "pathGlobal": "/"
+    }
+}

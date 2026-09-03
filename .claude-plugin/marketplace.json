@@ -1,0 +1,28 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ia-skills-claude",
+  "description": "Skills personales de Hugo Medina para Claude Code: generadores de proyectos base (.NET 10, Nuxt 4).",
+  "owner": {
+    "name": "Hugo Medina"
+  },
+  "plugins": [
+    {
+      "name": "base_net10",
+      "description": "Genera un backend .NET 10 nuevo, listo para compilar, con una arquitectura de referencia probada (Clean Architecture de 6 capas, MediatR CQRS, Dapper + Dapper.FastCrud, envelope Response<T>/Transaction, JWT preconfigurado, Serilog, Swagger) y un módulo CRUD de ejemplo.",
+      "category": "backend",
+      "source": {
+        "source": "local",
+        "path": "base_net10"
+      }
+    },
+    {
+      "name": "base_nuxt4",
+      "description": "Genera un proyecto Nuxt 4 base (SPA) con login, menú lateral colapsable por roles, topbar, panel de personalización de tema y modo oscuro/claro, sobre PrimeVue + Tailwind + Pinia con datos mock.",
+      "category": "frontend",
+      "source": {
+        "source": "local",
+        "path": "base_nuxt4"
+      }
+    }
+  ]
+}

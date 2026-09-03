@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 13px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, .font-black {
+    letter-spacing: -0.025em;
+}
+
+/* Capas de z-index para Toast/ConfirmDialog por encima de cualquier Dialog anidado */
+.p-toast.custom-toast-over-all {
+    z-index: 999999 !important;
+}
+.custom-toast-over-all .p-toast-message {
+    z-index: 1000000 !important;
+}
+.p-confirm-dialog.custom-confirm-over-all {
+    z-index: 999999 !important;
+}
+.p-dialog-mask.p-component-overlay,
+.p-toast-message-content {
+    z-index: 999997 !important;
+}

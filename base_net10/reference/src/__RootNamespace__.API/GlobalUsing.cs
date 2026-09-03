@@ -1,0 +1,10 @@
+global using Microsoft.AspNetCore.Hosting;
+global using Microsoft.AspNetCore.Http;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
+global using MediatR;
+global using Newtonsoft.Json;
+global using Swashbuckle.AspNetCore.Annotations;
+global using __RootNamespace__.Common.Enumeraciones;
+global using __RootNamespace__.Common.Result;

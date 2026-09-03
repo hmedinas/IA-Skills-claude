@@ -1,0 +1,12 @@
+global using MediatR;
+global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.Logging;
+global using Newtonsoft.Json;
+global using System.Security.Claims;
+global using __RootNamespace__.Common.Auth;
+global using __RootNamespace__.Common.Enumeraciones;
+global using __RootNamespace__.Common.Result;
+global using __RootNamespace__.Common.Utils;
+global using __RootNamespace__.Domain.Auth;
+global using __RootNamespace__.Domain.Entities;
+global using __RootNamespace__.Domain.Interfaces;

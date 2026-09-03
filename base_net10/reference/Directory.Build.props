@@ -1,0 +1,22 @@
+<Project>
+  <Import Project="build/dependencies.props" />
+
+  <!-- Disable Sourcelink on non Windows machines due to a bug -->
+  <!-- https://github.com/dotnet/sourcelink/issues/119 -->
+  <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+    <EnableSourceLink>false</EnableSourceLink>
+    <EnableSourceControlManagerQueries>false</EnableSourceControlManagerQueries>
+  </PropertyGroup>
+
+  <!-- Propiedades globales del proyecto -->
+  <PropertyGroup>
+    <PackageTags>Api __Aplicacion__</PackageTags>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <Authors>__Empresa__</Authors>
+    <Company>__Empresa__</Company>
+    <Copyright>Copyright ©__Year__ __Empresa__</Copyright>
+    <Product>__Aplicacion__</Product>
+    <Description>API __Aplicacion__</Description>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/01. API/">
+    <Project Path="src/__RootNamespace__.API/__RootNamespace__.API.csproj" />
+    <Project Path="src/__RootNamespace__.Host/__RootNamespace__.Host.csproj" />
+  </Folder>
+  <Folder Name="/02. Application/">
+    <Project Path="src/__RootNamespace__.Application/__RootNamespace__.Application.csproj" />
+  </Folder>
+  <Folder Name="/03. Infraestructure/">
+    <Project Path="src/__RootNamespace__.Infrastructure/__RootNamespace__.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/04. Domain/">
+    <Project Path="src/__RootNamespace__.Domain/__RootNamespace__.Domain.csproj" />
+  </Folder>
+  <Folder Name="/05. Common/">
+    <Project Path="src/__RootNamespace__.Common/__RootNamespace__.Common.csproj" />
+  </Folder>
+</Solution>
