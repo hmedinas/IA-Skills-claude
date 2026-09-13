@@ -1,0 +1,15 @@
+{
+  "app": {
+     "useMock": true,
+      "useMockUser": true,
+      "version": "1.1.0",
+      "nameApplication": "__AppDisplayName__",
+      "isMantenimiento": false,
+      "viewLog": true,
+      "logLevel": "debug"
+  },
+  "api": {
+    "baseUrl": "https://api-dev.miapp.com",
+    "authUrl": "https://api-dev.miapp.com"
+  }
+}

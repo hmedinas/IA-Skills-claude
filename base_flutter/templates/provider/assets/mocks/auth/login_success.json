@@ -1,0 +1,34 @@
+{
+  "isAuthenticated": true,
+  "message" : "Autenticado correctamente",
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlVzdWFyaW8gRGVtbyIsImlhdCI6MTUxNjIzOTAyMiwiZXhwIjo5OTk5OTk5OTk5LCJlbXByZXNhIjoiRW1wcmVzYSBEZW1vIiwicm9sZSI6ImFkbWluIn0.demoSignatureNotAValidToken",
+  "user": {
+    "title":  "Tecnico",
+    "fullName": "Usuario Demo",
+    "userName":     "usuario.demo",
+    "email":        "demo@ejemplo.com",
+    "userHash":     null,
+    "isActive":     true,
+    "department":   24,
+    "departmentDesc": "Sistemas",
+    "idUser": 123,
+    "roles": [
+      "Administrador",
+      "Supervisor"
+    ],
+    "businessModels":[
+      {
+        "idEmpresa": 1,
+        "empresa": "Empresa 1",
+        "desEmpresa":"Descripcion empresa",
+        "negocio":"IMPORTACIONES"
+      },
+      {
+        "idEmpresa": 2,
+        "empresa": "Empresa 2",
+        "desEmpresa":"Descripcion empresa",
+        "negocio":"EXPORTACIONES"
+      }
+    ]
+  }
+}
