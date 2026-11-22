@@ -1,2 +1,3 @@
-# Los scripts de shell siempre con LF: con CRLF bash falla (": command not found").
+# Los scripts de shell siempre con LF, también en Windows con core.autocrlf=true:
+# con CRLF bash falla con errores tipo "$'\r': command not found".
 *.sh text eol=lf
