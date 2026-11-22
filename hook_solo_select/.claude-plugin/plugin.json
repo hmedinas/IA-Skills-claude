@@ -1,0 +1,10 @@
+{
+  "name": "hook_solo_select",
+  "version": "1.0.0",
+  "description": "Hook PreToolUse: bloquea comandos de clientes SQL (sqlcmd, Invoke-Sqlcmd, psql, mysql…) que no sean SELECT o que ejecuten un archivo, para que la BD sea de solo lectura para Claude.",
+  "author": {
+    "name": "Hugo Medina"
+  },
+  "repository": "https://github.com/hmedinas/IA-Skills-claude",
+  "license": "MIT"
+}

@@ -1,0 +1,40 @@
+{
+  "name": "mcp_sql_lectura",
+  "version": "1.0.0",
+  "description": "Servidor MCP (C# / .NET 10) de SOLO LECTURA para SQL Server: herramientas consultar, listar_tablas, describir_tabla, ver_definicion y buscar_en_codigo. Tres barreras: validador (una sola sentencia SELECT/WITH), transacción que siempre se deshace y conexión ReadOnly. La contraseña vive en un archivo fuera del repo.",
+  "author": {
+    "name": "Hugo Medina"
+  },
+  "repository": "https://github.com/hmedinas/IA-Skills-claude",
+  "license": "MIT",
+  "keywords": [
+    "mcp",
+    "sql-server",
+    "solo-lectura",
+    "dotnet"
+  ],
+  "userConfig": {
+    "archivo_conexion": {
+      "type": "file",
+      "title": "Archivo de conexión",
+      "description": "Archivo de texto FUERA del repositorio con la cadena de conexión en una línea (usa un login de solo lectura). Las líneas que empiezan por # se ignoran.",
+      "required": true
+    },
+    "max_filas": {
+      "type": "number",
+      "title": "Máximo de filas",
+      "description": "Filas que devuelve 'consultar' si no se indica otra cosa (tope 5000).",
+      "default": 200,
+      "min": 1,
+      "max": 5000
+    },
+    "timeout_segundos": {
+      "type": "number",
+      "title": "Timeout (segundos)",
+      "description": "Tiempo máximo por consulta.",
+      "default": 30,
+      "min": 1,
+      "max": 300
+    }
+  }
+}

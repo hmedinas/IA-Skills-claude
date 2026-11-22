@@ -1,0 +1,10 @@
+{
+  "name": "base_net10",
+  "version": "1.0.0",
+  "description": "Genera un backend .NET 10 nuevo, listo para compilar, con una arquitectura de referencia probada (Clean Architecture de 6 capas, MediatR CQRS, Dapper + Dapper.FastCrud, envelope Response<T>/Transaction, JWT preconfigurado, Serilog, Swagger) y un módulo CRUD de ejemplo.",
+  "author": {
+    "name": "Hugo Medina"
+  },
+  "repository": "https://github.com/hmedinas/IA-Skills-claude",
+  "license": "MIT"
+}

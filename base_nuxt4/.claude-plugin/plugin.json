@@ -1,0 +1,10 @@
+{
+  "name": "base_nuxt4",
+  "version": "1.0.0",
+  "description": "Genera un proyecto Nuxt 4 base (SPA) con login, menú lateral colapsable por roles, topbar, panel de personalización de tema y modo oscuro/claro, sobre PrimeVue + Tailwind + Pinia con datos mock.",
+  "author": {
+    "name": "Hugo Medina"
+  },
+  "repository": "https://github.com/hmedinas/IA-Skills-claude",
+  "license": "MIT"
+}

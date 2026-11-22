@@ -1,0 +1,10 @@
+{
+  "name": "agente_implementador",
+  "version": "1.0.0",
+  "description": "Agente implementador: ejecuta un encargo concreto y acotado siguiendo AGENTS.md y CLAUDE.md del proyecto y deja los builds en verde. No decide diseño, no hace commit.",
+  "author": {
+    "name": "Hugo Medina"
+  },
+  "repository": "https://github.com/hmedinas/IA-Skills-claude",
+  "license": "MIT"
+}

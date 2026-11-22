@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "ia-skills-claude",
-  "description": "Skills personales de Hugo Medina para Claude Code: generadores de proyectos base (.NET 10, Nuxt 4).",
+  "description": "Componentes personales de Hugo Medina para Claude Code: skills generadoras (.NET 10, Nuxt 4, Flutter), arnés de trabajo con agentes, agentes, hooks y un MCP de SQL Server de solo lectura.",
   "owner": {
     "name": "Hugo Medina"
   },
@@ -10,28 +10,55 @@
       "name": "base_net10",
       "description": "Genera un backend .NET 10 nuevo, listo para compilar, con una arquitectura de referencia probada (Clean Architecture de 6 capas, MediatR CQRS, Dapper + Dapper.FastCrud, envelope Response<T>/Transaction, JWT preconfigurado, Serilog, Swagger) y un módulo CRUD de ejemplo.",
       "category": "backend",
-      "source": {
-        "source": "local",
-        "path": "base_net10"
-      }
+      "source": "./base_net10"
     },
     {
       "name": "base_nuxt4",
       "description": "Genera un proyecto Nuxt 4 base (SPA) con login, menú lateral colapsable por roles, topbar, panel de personalización de tema y modo oscuro/claro, sobre PrimeVue + Tailwind + Pinia con datos mock.",
       "category": "frontend",
-      "source": {
-        "source": "local",
-        "path": "base_nuxt4"
-      }
+      "source": "./base_nuxt4"
     },
     {
       "name": "base_flutter",
       "description": "Genera una app Flutter nueva (Clean Architecture feature-first, cliente Dio con mocks, config por entorno, theming, routing, sesión + login) a partir de las plantillas gemelas Provider o Riverpod, renombrando pubspec, imports y todos los identificadores nativos (Android/iOS/macOS/Linux/Windows/Web).",
       "category": "mobile",
-      "source": {
-        "source": "local",
-        "path": "base_flutter"
-      }
+      "source": "./base_flutter"
+    },
+    {
+      "name": "arnes_trabajo",
+      "description": "Arnés de trabajo con agentes para cualquier proyecto: AGENTS.md, CLAUDE.md, progress.md, Resumen.md, init.sh con hook SessionStart, agentes implementador/revisor, memoria versionada y planes por etapas con aprobación humana y gates. Modos instalar, revisar, diseno, implementar y cierre.",
+      "category": "workflow",
+      "source": "./arnes_trabajo"
+    },
+    {
+      "name": "agente_implementador",
+      "description": "Agente implementador: ejecuta un encargo concreto y acotado siguiendo AGENTS.md y CLAUDE.md del proyecto y deja los builds en verde. No decide diseño, no hace commit.",
+      "category": "agent",
+      "source": "./agente_implementador"
+    },
+    {
+      "name": "agente_revisor",
+      "description": "Agente revisor (solo lectura): revisa el diff contra el encargo y CLAUDE.md buscando bugs, seguridad y reglas rotas; reporta con archivo:línea. No edita código.",
+      "category": "agent",
+      "source": "./agente_revisor"
+    },
+    {
+      "name": "hook_inicio_sesion",
+      "description": "Hook SessionStart: si el proyecto tiene init.sh lo ejecuta al abrir, retomar o compactar la sesión y su salida entra como contexto.",
+      "category": "hook",
+      "source": "./hook_inicio_sesion"
+    },
+    {
+      "name": "hook_solo_select",
+      "description": "Hook PreToolUse: bloquea comandos de clientes SQL (sqlcmd, Invoke-Sqlcmd, psql, mysql…) que no sean SELECT o que ejecuten un archivo, para que la BD sea de solo lectura para Claude.",
+      "category": "hook",
+      "source": "./hook_solo_select"
+    },
+    {
+      "name": "mcp_sql_lectura",
+      "description": "Servidor MCP (C# / .NET 10) de SOLO LECTURA para SQL Server: herramientas consultar, listar_tablas, describir_tabla, ver_definicion y buscar_en_codigo. Tres barreras: validador (una sola sentencia SELECT/WITH), transacción que siempre se deshace y conexión ReadOnly. La contraseña vive en un archivo fuera del repo.",
+      "category": "mcp",
+      "source": "./mcp_sql_lectura"
     }
   ]
 }

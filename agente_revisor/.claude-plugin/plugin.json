@@ -1,0 +1,10 @@
+{
+  "name": "agente_revisor",
+  "version": "1.0.0",
+  "description": "Agente revisor (solo lectura): revisa el diff contra el encargo y CLAUDE.md buscando bugs, seguridad y reglas rotas; reporta con archivo:línea. No edita código.",
+  "author": {
+    "name": "Hugo Medina"
+  },
+  "repository": "https://github.com/hmedinas/IA-Skills-claude",
+  "license": "MIT"
+}

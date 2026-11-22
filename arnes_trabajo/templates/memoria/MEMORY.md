@@ -1,0 +1,1 @@
+- [Arnés de trabajo](arnes-trabajo.md) — instalado {{FECHA}} con la skill arnes_trabajo; reglas clave: BD solo SELECT, commit solo si se pide, cierre documentado

@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "sql-lectura": {
+      "command": "dotnet",
+      "args": [
+        "run", "--project", "${CLAUDE_PLUGIN_ROOT}/src/McpSqlLectura",
+        "-c", "Release", "-v", "q", "--nologo", "-p:NuGetAudit=false"
+      ],
+      "env": {
+        "DOTNET_NOLOGO": "1",
+        "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+        "MCP_SQL_CONEXION_ARCHIVO": "${user_config.archivo_conexion}",
+        "MCP_SQL_MAX_FILAS": "${user_config.max_filas}",
+        "MCP_SQL_TIMEOUT": "${user_config.timeout_segundos}"
+      }
+    }
+  }
+}

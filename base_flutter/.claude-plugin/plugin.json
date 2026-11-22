@@ -1,0 +1,10 @@
+{
+  "name": "base_flutter",
+  "version": "1.0.0",
+  "description": "Genera una app Flutter nueva (Clean Architecture feature-first, cliente Dio con mocks, config por entorno, theming, routing, sesión + login) a partir de las plantillas gemelas Provider o Riverpod, renombrando pubspec, imports y todos los identificadores nativos (Android/iOS/macOS/Linux/Windows/Web).",
+  "author": {
+    "name": "Hugo Medina"
+  },
+  "repository": "https://github.com/hmedinas/IA-Skills-claude",
+  "license": "MIT"
+}
