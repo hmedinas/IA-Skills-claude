@@ -14,7 +14,7 @@
 | **MCP** | Un programa que le da a Claude herramientas nuevas (tu BD, Jira, Azure DevOps…) | Proceso aparte, registrado en `.mcp.json` | [04](04-mcp.md) |
 | **Plugin** | Un paquete con skills, agentes, hooks y MCP, que se instala de una vez | Repo con `.claude-plugin/` | [05](05-plugins-y-marketplace.md) |
 | **Settings y modos** | Permisos, modo de trabajo (pedir permiso, editar solo, solo planificar) y estilo de respuesta | `settings.json`, `Shift+Tab` | [06](06-settings-y-modos.md) |
-| **Arnés de trabajo** | La skill `arnes_trabajo`: instalación, los cinco modos, el cierre y la ficha de requerimiento | Tu proyecto (`AGENTS.md`, `init.sh`, `doc/fichas/`…) | [07](07-arnes-trabajo.md) |
+| **Arnés de trabajo** | La skill `arnes_trabajo`: instalación, modo privado para repos compartidos, los cinco modos, el cierre y las fichas | Tu proyecto (`AGENTS.md`, `init.sh`, `doc/fichas/`…) | [07](07-arnes-trabajo.md) |
 
 ## ¿Cuál necesito?
 

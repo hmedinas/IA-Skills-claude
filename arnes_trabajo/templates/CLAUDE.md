@@ -80,7 +80,7 @@ Typos, formato, renombres triviales sin impacto funcional, experimentos revertid
 ### Orden al terminar una tarea
 1. Completar el cambio en código o SQL.
 2. Actualizar `Resumen.md`, los otros documentos afectados y `progress.md`.
-3. Crear o actualizar la ficha de requerimiento en `{{FICHAS_DIR}}/` (en Borrador; ver `AGENTS.md` §4).
+3. Crear o actualizar la ficha de requerimiento en `{{FICHAS_BORRADORES_DIR}}/` (en Borrador; ver `AGENTS.md` §4).
 4. Responder al usuario indicando qué documentos se actualizaron.
 
 ---

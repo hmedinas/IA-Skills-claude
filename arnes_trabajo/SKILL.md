@@ -1,6 +1,6 @@
 ---
 name: arnes_trabajo
-description: Arnés de trabajo con agentes para cualquier proyecto (Claude Code, Cursor u otro LLM). Instala o revisa AGENTS.md, CLAUDE.md, progress.md, Resumen.md, init.sh con hook SessionStart, agentes implementador/revisor, memoria versionada y planes por etapas con aprobación humana; guía el diseño de un módulo (preguntas en bloques → plan en Borrador), la implementación por etapas con gate y el cierre documentado con ficha de requerimiento (TCK/REQ/EVO) y ADR. Úsala cuando el usuario pida montar, preparar, revisar o copiar "el arnés" o "la forma de trabajar" en un proyecto, diseñar un módulo o funcionalidad grande antes de programarla, implementar un plan aprobado o cerrar una tarea con su documentación o su ficha de requerimiento. Pensada para proyectos multi-repo, con base de datos de solo lectura y commits solo a petición.
+description: Arnés de trabajo con agentes para cualquier proyecto (Claude Code, Cursor u otro LLM). Instala o revisa AGENTS.md, CLAUDE.md, progress.md, Resumen.md, init.sh con hook SessionStart, agentes implementador/revisor, memoria versionada y planes por etapas con aprobación humana; guía el diseño de un módulo (preguntas en bloques → plan en Borrador), la implementación por etapas con gate y el cierre documentado con ficha de requerimiento (prefijos configurables) y ADR. Modo privado para repos compartidos (.git/info/exclude). Úsala cuando el usuario pida montar, preparar, revisar o copiar "el arnés" o "la forma de trabajar" en un proyecto, diseñar un módulo o funcionalidad grande antes de programarla, implementar un plan aprobado o cerrar una tarea con su documentación o su ficha de requerimiento. Pensada para proyectos multi-repo, con base de datos de solo lectura y commits solo a petición.
 argument-hint: "[instalar | revisar | diseno <modulo> | implementar <modulo> | cierre]"
 ---
 
@@ -58,6 +58,9 @@ preguntar qué quiere hacer.
 6. **Decir la verdad sobre la verificación.** Siempre se dice qué se compiló, qué se probó y qué no.
 7. **Idioma del proyecto** en todo lo que se escribe (por defecto, el del usuario).
 8. **Ni servidores ni procesos largos** que el usuario ya tenga abiertos. Los builds de verificación van a carpeta temporal.
+9. **En un repo compartido, el arnés es personal** (modo privado): sus archivos existen en el disco de cada uno, pero git no los ve.
+   Solo se comparten las fichas y los ADR **aprobados**. La memoria del agente **nunca** se comparte.
+   Los archivos se añaden a git **por nombre**: nunca `git add .` ni `git add -A`.
 
 ---
 
@@ -75,6 +78,10 @@ preguntar qué quiere hacer.
   Solo se anota que existen; **nunca se copian credenciales**.
 - **Memoria del agente:** `~/.claude/projects/<clave>/memory/`. La clave es la ruta absoluta del proyecto con cada carácter
   no alfanumérico cambiado por `-`.
+- **Autores del repo:** `git -C <repo> shortlog -sne HEAD | wc -l`. Va con `HEAD`: sin él, `shortlog` espera la entrada estándar y no devuelve nada.
+  Si hay más de un autor, el repo es compartido y se recomienda el modo **privado**.
+- **Archivos del arnés ya versionados:** `git ls-files -- CLAUDE.md AGENTS.md progress.md Resumen.md init.sh .claude doc/agentes/memoria 'plan-implementacion-*.md'`.
+  Si el equipo ya comparte alguno (p. ej. `CLAUDE.md` o `.claude/settings.json`), se tiene en cuenta en el modo privado.
 - **Fichas y ADR existentes:** carpetas como `doc/fichas/`, `doc/requerimientos/`, `doc/adr/`, `docs/decisions/`. Si ya hay una, se propone esa.
 - **Plugin `hook_inicio_sesion`:** buscar `hook_inicio_sesion@` en `enabledPlugins` de `~/.claude/settings.json` y de
   `.claude/settings.json` (o la salida de `claude plugin list`). Ese plugin **también** ejecuta `init.sh` al arrancar: si está
@@ -83,8 +90,14 @@ preguntar qué quiere hacer.
 ### 2. Preguntar en bloques (solo lo que no se pudo detectar)
 Usar la herramienta de preguntas con 3–4 preguntas por bloque, con lo detectado como opción recomendada. Parar en
 cuanto se pueda rellenar la plantilla.
-- **Bloque A, proyecto:** nombre, idioma, repos detectados (confirmar), quién hace commit/push.
-- **Bloque A2, fichas:** carpeta destino de las fichas de requerimiento (por defecto `doc/fichas`) y de los ADR (por defecto `doc/adr`).
+- **Bloque A, proyecto:** nombre, idioma, repos detectados (confirmar), quién hace commit/push y **modo del arnés**:
+  - **Privado** (recomendado si el repo tiene varios autores): los archivos del arnés están en el disco pero git no los ve
+    (`.git/info/exclude`). Solo se versionan las fichas y los ADR aprobados.
+  - **Versionado** (proyecto propio, o el equipo acuerda compartir el arnés): todo se sube con el repo.
+- **Bloque A2, fichas:**
+  - carpeta de las fichas aprobadas (por defecto `doc/fichas`) y de los ADR (por defecto `doc/adr`). En modo privado, además,
+    la de borradores locales (por defecto `doc/fichas/borradores` y `doc/adr/borradores`). En modo versionado, los borradores van en la misma carpeta;
+  - **prefijos de ID** que usa el equipo (por defecto `TCK REQ EVO`; p. ej. `TCK RFC REQ EVO`). `EVO`, con id aleatorio, siempre está disponible.
   Por ahora el destino es siempre una carpeta de `.md`; la integración con un gestor de tickets queda para más adelante.
 - **Bloque B, verificación:** comando de build de cada parte, servidores que el usuario tiene abiertos (puertos) y que no hay que arrancar.
 - **Bloque C, datos:** si hay BD; si el acceso del agente es de solo lectura; carpeta y numeración de scripts; quién los ejecuta.
@@ -95,19 +108,44 @@ cuanto se pueda rellenar la plantilla.
   - notas de memoria privadas que no deben copiarse al repo.
 
 ### 3. Generar
-1. Enseñar la lista de archivos a **crear** y a **integrar** (los existentes, con la sección que se añade). Esperar el OK.
+0. **Solo en modo privado, antes de crear nada:**
+   - Comprobar con `git ls-files` que ninguno de los archivos del arnés está ya en git. Si alguno lo está, **avisar y no excluirlo sin preguntar**
+     (excluir un archivo versionado no lo oculta, y sacarlo del índice afecta a todo el equipo). Opciones para el usuario:
+     integrar en el archivo compartido solo lo común, enseñándolo antes; o dejar ese archivo fuera del arnés.
+     Si `.claude/` ya tiene archivos versionados, no se excluye entera: solo `/.claude/agents/implementador.md`, `/.claude/agents/revisor.md`
+     y `/.claude/settings.local.json`, y el hook va en `.claude/settings.local.json`.
+   - Añadir a `.git/info/exclude` las líneas que falten, **sin duplicar**, bajo el comentario `# arnes_trabajo (modo privado)`.
+     Con las rutas elegidas en el bloque A2:
+     ```
+     /CLAUDE.md
+     /AGENTS.md
+     /progress.md
+     /Resumen.md
+     /init.sh
+     /.claude/
+     /plan-implementacion-*.md
+     /doc/agentes/memoria/
+     /doc/fichas/borradores/
+     /doc/adr/borradores/
+     ```
+     `{{FICHAS_DIR}}/` y `{{ADR_DIR}}/` **no** se excluyen: ahí van las aprobadas, que son la memoria común del equipo.
+   - Si la raíz no es repo y los repos son subcarpetas, el arnés de la raíz ya queda fuera de git. Solo hay que excluir lo que caiga
+     dentro de un repo, en el `.git/info/exclude` de ese repo.
+1. Enseñar la lista de archivos a **crear** y a **integrar** (los existentes, con la sección que se añade) y, en modo privado,
+   las líneas añadidas a `.git/info/exclude`. Esperar el OK.
 2. Crear desde `templates/`, sustituyendo los marcadores (tabla al final). Lo que no aplique **se borra**: no se dejan marcadores ni secciones vacías.
    - `AGENTS.md`, `CLAUDE.md`, `progress.md`, `Resumen.md` y `init.sh` van en la raíz.
    - `settings.json` va en `.claude/settings.json`. Si ya existe, **añadir** el hook `SessionStart` sin quitar nada.
      Si el plugin `hook_inicio_sesion` está activo, **avisar** de que `init.sh` se ejecutaría dos veces y preguntar qué prefiere:
      quitar el plugin (`claude plugin uninstall hook_inicio_sesion@ia-skills-claude`, recomendado si el proyecto se comparte) o no añadir el hook al proyecto.
    - `agents/implementador.md` y `agents/revisor.md` van en `.claude/agents/`.
-   - `memoria/MEMORY.md` va en `doc/agentes/memoria/MEMORY.md`.
+   - `memoria/MEMORY.md` va en `doc/agentes/memoria/MEMORY.md`. En modo privado es una **copia local** (`{{MEMORIA_TEXTO}}`):
+     la memoria es personal y no se comparte nunca.
    - `plan-implementacion.md` **no se copia** al instalar: es la plantilla del modo `diseno`.
    - `ficha-requerimiento.md` y `adr.md` **no se copian**: son las plantillas del modo `cierre`. Las carpetas `{{FICHAS_DIR}}/` y
-     `{{ADR_DIR}}/` se crean vacías (con un `.gitkeep`).
+     `{{ADR_DIR}}/` se crean vacías con un `.gitkeep`. Las de borradores del modo privado se crean **sin** `.gitkeep` (están excluidas).
 3. Respetar el fin de línea dominante del proyecto en los `.md`. `init.sh` siempre con LF.
-4. Ejecutar `bash init.sh` y corregir lo que marque.
+4. Ejecutar `bash init.sh` y corregir lo que marque. En modo privado debe salir `OK  ningún archivo del arnés es visible para git`.
 5. Guardar en la memoria del agente una nota breve: "arnés instalado AAAA-MM-DD, reglas clave X/Y/Z".
 6. Responder con:
    - qué se creó y qué se integró;
@@ -128,6 +166,12 @@ cuanto se pueda rellenar la plantilla.
    - ¿el hook usa la forma robusta (`"shell": "bash"` y `"${CLAUDE_PROJECT_DIR:-.}/init.sh"`)? Si sigue con `bash init.sh` a secas, proponer el cambio;
    - ¿está activo también el plugin `hook_inicio_sesion`? Entonces `init.sh` se ejecuta dos veces: avisar (ver `instalar`);
    - ¿existen la carpeta de fichas y la de ADR, y hay fichas en **Borrador** pendientes de aprobar?
+   - ¿las fichas usan los prefijos de `PREFIJOS_FICHA`?
+   - **¿repo compartido con el arnés a la vista?** Si el repo tiene varios autores (`git shortlog -sne HEAD`) y hay archivos del arnés
+     visibles para git (`git status --porcelain --ignored`, `git ls-files`), proponer el modo privado. Si ya estaban versionados, explicar
+     que dejar de versionarlos es `git rm --cached <archivo>` (el archivo sigue en el disco), que lo decide el equipo porque al hacer pull
+     se borra de las copias de los demás, y que lo ya subido sigue en el historial.
+   - en modo privado, ¿hay en `{{FICHAS_DIR}}/` fichas que no estén *Aprobadas*? No deberían estar ahí.
 3. Informar en una tabla: falta, sobra, desactualizado. Proponer parches concretos y aplicarlos **solo con OK**.
 4. Si `progress.md` supera 60 líneas, proponer pasar lo histórico a la bitácora de `Resumen.md`.
 
@@ -201,7 +245,8 @@ Se aplica al terminar **cualquier** tarea que cambie el producto, use o no el mo
    - los documentos que dependan del cambio (resumen de API, manual de usuario, roadmap).
 4. **Ficha de requerimiento**, siempre (ver la sección siguiente).
 5. Si una decisión perdura más allá de la tarea (arquitectura, convención, librería, regla de negocio), **proponer** convertirla en ADR.
-   Solo se escribe si el usuario acepta: `{{ADR_DIR}}/NNNN-titulo.md` desde `templates/adr.md`, en estado **Propuesto**, y se enlaza en la ficha.
+   Solo se escribe si el usuario acepta: `{{ADR_BORRADORES_DIR}}/NNNN-titulo.md` desde `templates/adr.md`, en estado **Propuesto**, y se enlaza en la ficha.
+   Pasa a `{{ADR_DIR}}/` cuando el usuario lo acepta (ver *Aprobar una ficha o un ADR*).
 6. Si hubo decisiones o preferencias nuevas del usuario, guardarlas en la memoria del agente y recordar `bash init.sh --sync-memoria`.
 7. Responder al usuario con:
    - qué cambió;
@@ -212,28 +257,39 @@ Se aplica al terminar **cualquier** tarea que cambie el producto, use o no el mo
    - que no hay commit, salvo que lo pidiera.
 
 ### Ficha de requerimiento
-Cada tarea cerrada deja una ficha en `{{FICHAS_DIR}}/`, creada desde `templates/ficha-requerimiento.md`. Es lo que lee quien llegue
-después (otra persona del equipo u otro agente) para saber qué se pidió, qué se decidió, qué se tocó y qué falta.
+Cada tarea cerrada deja una ficha, creada desde `templates/ficha-requerimiento.md`. Es lo que lee quien llegue después
+(otra persona del equipo u otro agente) para saber qué se pidió, qué se decidió, qué se tocó y qué falta.
 
-**Nombre del archivo** (`<titulo>` en minúsculas, sin tildes, con guiones, máximo ~50 caracteres):
+**Dónde se guarda** (según el `MODO` de `init.sh`):
+
+| Modo | Borrador | Aprobada |
+|---|---|---|
+| Versionado | `{{FICHAS_DIR}}/` | `{{FICHAS_DIR}}/` (solo cambia el estado) |
+| Privado | `{{FICHAS_BORRADORES_DIR}}/`: local, excluida de git, **nunca se sube** | `{{FICHAS_DIR}}/`: versionada, memoria común del equipo |
+
+**Nombre del archivo:** `<PREFIJO>-<número>-<titulo>.md`, con uno de los prefijos de `PREFIJOS_FICHA` (en `init.sh`; por defecto `TCK REQ EVO`).
+`<titulo>` va en minúsculas, sin tildes, con guiones y con un máximo de ~50 caracteres.
 
 | La tarea tiene… | Archivo | Ejemplo |
 |---|---|---|
-| Un ticket asignado | `TCK-<número>-<titulo>.md` | `TCK-123-error-al-exportar-pdf.md` |
-| Un requerimiento | `REQ-<número>-<titulo>.md` | `REQ-123-alta-de-proveedores.md` |
-| Ninguno de los dos (evolutivo) | `EVO-<id>-<titulo>.md` | `EVO-9f3a61c2-filtro-por-fecha.md` |
+| Un número en el sistema del equipo (ticket, requerimiento, petición de cambio…) | `<PREFIJO>-<número>-<titulo>.md` | `TCK-123-error-al-exportar-pdf.md`, `RFC-214-limite-de-credito.md` |
+| Nada de eso (evolutivo) | `EVO-<id>-<titulo>.md` | `EVO-9f3a61c2-filtro-por-fecha.md` |
 
-- El número de ticket o requerimiento sale del plan, de `progress.md`, del nombre de la rama o del mensaje del usuario. Si no está claro,
-  **preguntar una vez** (ticket, requerimiento o evolutivo). No inventar números.
+- **Detectar el ID:** buscar `<PREFIJO>-<número>` con cualquiera de los prefijos de `PREFIJOS_FICHA`, sin distinguir mayúsculas
+  (también `<PREFIJO>_<número>` o `<PREFIJO>/<número>`), en el nombre de la rama, en el plan, en `progress.md` y en el mensaje del usuario.
+  Ejemplo: rama `feature/rfc-214-limite` → `RFC-214`. Si no aparece, o aparecen varios, **preguntar una vez**. No inventar números.
+  Un prefijo que no está en la lista no se usa sin preguntar. Si el usuario lo confirma, proponer añadirlo a `PREFIJOS_FICHA`.
 - El `<id>` de un evolutivo son 8 caracteres hexadecimales aleatorios, para que no choque con el de otra persona del equipo:
-  `od -An -N4 -tx1 /dev/urandom | tr -d ' \n'` (o `openssl rand -hex 4`). Se comprueba que no exista ya en `{{FICHAS_DIR}}/`.
+  `od -An -N4 -tx1 /dev/urandom | tr -d ' \n'` (o `openssl rand -hex 4`). Se comprueba que no exista ya en las carpetas de fichas.
   No se usa el hash de un commit porque al cerrar puede no haber commit todavía y una tarea puede tener varios; los commits van dentro de la ficha.
 - Al crearla, la ruta se anota en el plan (cabecera) y en `progress.md` (`Ficha: …`), para encontrarla en el siguiente cierre.
 
-**Crear o actualizar:**
-- Si ya existe una ficha con ese ID, se **actualiza**: se parchean las secciones, se añade una línea al historial y, si estaba *Aprobada*,
-  vuelve a **Borrador** con el motivo.
+**Crear o actualizar:** buscar una ficha con ese ID en `{{FICHAS_BORRADORES_DIR}}/` y en `{{FICHAS_DIR}}/`.
 - Si no existe, se crea en **Borrador** con la fecha del sistema.
+- Si existe en Borrador, se **actualiza**: se parchean las secciones y se añade una línea al historial.
+- Si existe *Aprobada* y hay cambios:
+  - en modo versionado, vuelve a **Borrador** con el motivo;
+  - en modo privado, la aprobada no se toca: se crea en `{{FICHAS_BORRADORES_DIR}}/` una copia en Borrador con los cambios, que la sustituye cuando se aprueba.
 
 **Cómo se rellena** (sin inventar nada: lo que no se sepa se deja como pendiente o se pregunta):
 - **Objetivo, contexto, decisiones y descartes:** del plan (`Objetivo`, `Decisiones`, `Fuera de alcance`) o, si no hay plan, de lo acordado en la sesión.
@@ -242,14 +298,27 @@ después (otra persona del equipo u otro agente) para saber qué se pidió, qué
 - **Qué se ejecutó y dónde, pruebas y resultado:** de los gates, de `init.sh --build` y de lo que el usuario confirmó. Lo no probado va a *No verificado*.
 - **Hallazgos y pendientes:** de `progress.md` y del plan (*Pendiente para siguiente versión*).
 
-**Filtro antes de guardar** (obligatorio, porque la ficha se comparte y se versiona):
+**Filtro antes de guardar** (obligatorio, porque la ficha se comparte):
 - sin credenciales, tokens, claves ni cadenas de conexión;
 - sin datos de producción: filas reales, nombres, correos o importes de personas o clientes;
 - sin nombres de servidor, IPs internas ni rutas de máquinas concretas (se dice "entorno de pruebas", no su nombre);
 - sin conversación en bruto: se resume lo decidido.
 
-**Aprobación:** la ficha queda en **Borrador** hasta que el usuario la apruebe (mismas reglas que los planes, principio 4).
-El agente nunca la marca como *Aprobada* por su cuenta.
+### Aprobar una ficha o un ADR
+Solo el usuario aprueba, con las mismas reglas que los planes (principio 4). El agente nunca aprueba una ficha ni acepta un ADR por su cuenta.
+1. Cambiar el estado a **Aprobada** (ficha) o **Aceptado** (ADR), con la fecha y, si fue en el chat, las palabras del usuario.
+2. **Volver a pasar el filtro.** Es lo último antes de que el archivo pueda entrar en git.
+3. **Modo privado:** mover el archivo de `{{FICHAS_BORRADORES_DIR}}/` a `{{FICHAS_DIR}}/` (o de `{{ADR_BORRADORES_DIR}}/` a `{{ADR_DIR}}/`),
+   sustituyendo la versión aprobada anterior si la había. Después, decir al usuario el comando exacto:
+   ```
+   git add {{FICHAS_DIR}}/RFC-214-limite-de-credito.md
+   ```
+   Siempre **por nombre**: nunca `git add .` ni `git add -A`. El commit lo hace el usuario, o el agente si se lo pide.
+4. **Modo versionado:** el archivo ya está en su sitio. Se indica igualmente el `git add` por nombre.
+5. La publicación en la web del equipo la hace a mano quien se ocupa de la documentación, a partir de `{{FICHAS_DIR}}/`. El agente no publica nada.
+
+**Antes de empezar una tarea**, leer en `{{FICHAS_DIR}}/` y `{{ADR_DIR}}/` las fichas y los ADR relacionados (mismo módulo o mismo ID):
+son lo que ya hicieron y decidieron los demás.
 
 ---
 
@@ -265,8 +334,14 @@ El agente nunca la marca como *Aprobada* por su cuenta.
 | `{{REPOS_TEXTO}}` | Frase sobre repos y raíz | `Dos repos (Backend/, Frontend/); la raíz no es repo` |
 | `{{REQUERIDOS}}` | Archivos clave extra que `init.sh` comprueba | `Backend/GestorPedidos.slnx Frontend/nuxt.config.ts` |
 | `{{NO_TOCAR}}` | Carpetas de otras herramientas | `.cursor/rules` |
-| `{{FICHAS_DIR}}` | Carpeta de fichas de requerimiento | `doc/fichas` |
-| `{{ADR_DIR}}` | Carpeta de ADR | `doc/adr` |
+| `{{MODO}}` | Modo del arnés: `privado` o `versionado` | `privado` |
+| `{{MODO_TEXTO}}` | Frase sobre el modo para `AGENTS.md` | `privado: el arnés está en .git/info/exclude; solo se versionan fichas y ADR aprobados` |
+| `{{MEMORIA_TEXTO}}` | Qué es `doc/agentes/memoria/` | `Copia local (excluida de git) de la memoria del agente` / `Copia versionada de la memoria del agente` |
+| `{{PREFIJOS_FICHA}}` | Prefijos de ID de las fichas, separados por espacio | `TCK RFC REQ EVO` |
+| `{{FICHAS_DIR}}` | Carpeta de fichas aprobadas | `doc/fichas` |
+| `{{FICHAS_BORRADORES_DIR}}` | Carpeta de fichas en Borrador (en modo versionado, la misma que `{{FICHAS_DIR}}`) | `doc/fichas/borradores` |
+| `{{ADR_DIR}}` | Carpeta de ADR aceptados | `doc/adr` |
+| `{{ADR_BORRADORES_DIR}}` | Carpeta de ADR propuestos (en modo versionado, la misma que `{{ADR_DIR}}`) | `doc/adr/borradores` |
 | `{{SCRIPTS_DIR}}` | Carpeta de scripts de BD (vacío si no hay) | `Script` |
 | `{{SCRIPT_PATRON}}` | Patrón de nombre | `NN-accion-Objeto-descripcion.sql` |
 | `{{BD_TEXTO}}` | Regla de BD acordada | `solo SELECT con el login de lectura que indique el usuario` |
@@ -281,8 +356,8 @@ Plantillas del modo `cierre` (se rellenan al crear cada ficha o ADR, no al insta
 
 | Marcador | Qué es | Ejemplo |
 |---|---|---|
-| `{{FICHA_ID}}` | ID de la ficha | `TCK-123`, `REQ-45`, `EVO-9f3a61c2` |
-| `{{FICHA_TIPO}}` | Ticket, Requerimiento o Evolutivo | `Ticket` |
+| `{{FICHA_ID}}` | ID de la ficha | `TCK-123`, `RFC-214`, `EVO-9f3a61c2` |
+| `{{FICHA_TIPO}}` | Qué significa el prefijo (ticket, requerimiento, petición de cambio, evolutivo…) | `Petición de cambio` |
 | `{{TITULO}}` | Título corto de la tarea o del ADR | `Error al exportar PDF` |
 | `{{PLAN}}` | Plan relacionado o `—` | `plan-implementacion-exportar.md` |
 | `{{REFERENCIA}}` | Enlace o código en el gestor de tickets, o `—` | `TCK-123` |

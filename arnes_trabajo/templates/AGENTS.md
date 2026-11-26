@@ -10,6 +10,7 @@
 2. Leer `progress.md`: tarea en curso, siguiente paso y pendientes del usuario.
 3. Leer `CLAUDE.md` (reglas). Si la tarea toca un módulo, leer también su sección de `Resumen.md` y su `plan-implementacion-*.md`.
 4. Para decisiones y preferencias del usuario, empezar por el índice `doc/agentes/memoria/MEMORY.md` y seguir a las notas.
+5. Si la tarea tiene ID o toca un módulo, leer sus fichas en `{{FICHAS_DIR}}/` y sus ADR en `{{ADR_DIR}}/`: es lo que ya hicieron y decidieron los demás.
 
 ## 1. Documentos y para qué sirve cada uno
 | Archivo | Qué es | Cuándo se actualiza |
@@ -18,9 +19,10 @@
 | `Resumen.md` | Estado del producto, decisiones y bitácora (largo, acumulativo) | Al cerrar cada cambio de producto (`CLAUDE.md` §3) |
 | `plan-implementacion-<modulo>.md` | Plan por etapas con estado, casillas `[x]` y gates | Al aprobarlo y al cerrar cada etapa |
 | `CLAUDE.md` | Reglas de código, SQL y estilo | Solo si el usuario cambia una regla |
-| `doc/agentes/memoria/` | Copia versionada de la memoria del agente (decisiones del usuario) | Con `bash init.sh --sync-memoria` |
-| `{{FICHAS_DIR}}/TCK-…`, `REQ-…`, `EVO-…` | Ficha de requerimiento de cada tarea: objetivo, decisiones, commits, pruebas, pendientes | Al cerrar cada tarea (§4) |
-| `{{ADR_DIR}}/NNNN-….md` | Decisiones de arquitectura que perduran (ADR) | Cuando el usuario acepta convertir una decisión en ADR |
+| `doc/agentes/memoria/` | {{MEMORIA_TEXTO}} (decisiones del usuario) | Con `bash init.sh --sync-memoria` |
+| `{{FICHAS_BORRADORES_DIR}}/` | Fichas de requerimiento en **Borrador** | Al cerrar cada tarea (§4) |
+| `{{FICHAS_DIR}}/` | Fichas **aprobadas** (`<PREFIJO>-<n>-<titulo>.md`): objetivo, decisiones, commits, pruebas, pendientes. Memoria común del equipo | Cuando el usuario aprueba una ficha |
+| `{{ADR_DIR}}/NNNN-….md` | Decisiones de arquitectura que perduran (ADR aceptados; los propuestos, en `{{ADR_BORRADORES_DIR}}/`) | Cuando el usuario acepta un ADR |
 {{DOCS_TABLA}}
 
 ### Planes de implementación
@@ -63,6 +65,8 @@ Flujo: `Orquestador (diseño acordado con el usuario) → Implementador (encargo
   - Todo cambio de BD va como script en `{{SCRIPTS_DIR}}/` y **lo ejecuta el usuario a mano**.
   - Nunca se edita un script ya ejecutado: se crea uno nuevo numerado.
 - **Git:** {{REPOS_TEXTO}}. Commit, push y ramas **solo si el usuario lo pide**. Los cambios sin commit no bloquean el trabajo.
+  - Los archivos se añaden **por nombre**: nunca `git add .` ni `git add -A`.
+  - **Modo del arnés:** {{MODO_TEXTO}}.
 - **Verificación:** {{VERIFICACION_TEXTO}}
 - **Entorno local:** {{ENTORNO_TEXTO}}. No arrancar otros servidores.
 {{REGLAS_PROPIAS}}
@@ -71,10 +75,11 @@ Flujo: `Orquestador (diseño acordado con el usuario) → Implementador (encargo
 1. Builds en verde, o decir exactamente qué falla.
 2. Revisor (si se usó) sin hallazgos abiertos.
 3. `progress.md`, `Resumen.md`, el plan y los documentos del módulo actualizados.
-4. **Ficha de requerimiento** creada o actualizada en `{{FICHAS_DIR}}/`, en estado **Borrador** hasta que el usuario la apruebe:
-   - nombre `TCK-<n>-<titulo>.md` (ticket), `REQ-<n>-<titulo>.md` (requerimiento) o `EVO-<id>-<titulo>.md` (evolutivo, `<id>` = 8 hex aleatorios);
+4. **Ficha de requerimiento** creada o actualizada en `{{FICHAS_BORRADORES_DIR}}/`, en estado **Borrador** hasta que el usuario la apruebe:
+   - nombre `<PREFIJO>-<n>-<titulo>.md` con un prefijo de `{{PREFIJOS_FICHA}}`, o `EVO-<id>-<titulo>.md` si no tiene número (`<id>` = 8 hex aleatorios);
+   - al aprobarla pasa a `{{FICHAS_DIR}}/`, se vuelve a filtrar y se dice el `git add` exacto, por nombre;
    - sin credenciales, datos de producción, nombres de servidor ni conversación en bruto;
-   - si una decisión perdura, se propone como ADR en `{{ADR_DIR}}/`.
+   - si una decisión perdura, se propone como ADR en `{{ADR_BORRADORES_DIR}}/`.
 5. Resumen al usuario con:
    - qué cambió;
    - qué scripts debe ejecutar y en qué orden;

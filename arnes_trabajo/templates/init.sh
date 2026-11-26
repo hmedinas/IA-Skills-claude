@@ -4,18 +4,23 @@
 #   (sin flags)      rápido: estructura, git, scripts SQL recientes, planes, progress.md, memoria
 #   --build          además compila con BUILD_BACK / BUILD_FRONT (salida en carpeta temporal)
 #   --sync-memoria   copia la memoria del agente (~/.claude/projects/<clave>/memory) a doc/agentes/memoria
+#                    (en modo privado es una copia local, excluida de git: la memoria nunca se comparte)
 # Nunca modifica el código del proyecto ni ejecuta SQL.
 
 # ---------------- Configuración del proyecto (editable) ----------------
 PROYECTO="{{PROYECTO}}"
+MODO="{{MODO}}"                   # privado: el arnés no se versiona (.git/info/exclude) · versionado: se sube con el repo
 REPOS="{{REPOS}}"                 # carpetas con .git separadas por espacio; "." si la raíz es el repo
 REQUERIDOS="{{REQUERIDOS}}"       # archivos/carpetas clave del proyecto (además de los del arnés)
 NO_TOCAR="{{NO_TOCAR}}"           # reglas de otras herramientas: se avisa de que existen, no se tocan
 SCRIPTS_DIR="{{SCRIPTS_DIR}}"     # carpeta de scripts de BD numerados; vacío si no hay BD
 MEMORIA_EXCLUIR="{{MEMORIA_EXCLUIR}}"  # notas de memoria privadas que no se copian al repo
 MEMORIA_DST="doc/agentes/memoria"
-FICHAS_DIR="{{FICHAS_DIR}}"       # fichas de requerimiento (TCK-/REQ-/EVO-*.md)
-ADR_DIR="{{ADR_DIR}}"             # decisiones de arquitectura (NNNN-*.md)
+PREFIJOS_FICHA="{{PREFIJOS_FICHA}}"   # prefijos de ID de las fichas; EVO (id aleatorio) siempre vale
+FICHAS_DIR="{{FICHAS_DIR}}"       # fichas aprobadas (<PREFIJO>-<n>-<titulo>.md)
+ADR_DIR="{{ADR_DIR}}"             # ADR aceptados (NNNN-*.md)
+FICHAS_BORRADORES="{{FICHAS_BORRADORES_DIR}}"  # fichas en Borrador (modo versionado: = FICHAS_DIR)
+ADR_BORRADORES="{{ADR_BORRADORES_DIR}}"        # ADR propuestos     (modo versionado: = ADR_DIR)
 # Builds de verificación: siempre a "$OUT" (carpeta temporal) para no pisar lo que el usuario tiene abierto.
 BUILD_BACK='{{BUILD_BACK}}'
 BUILD_FRONT='{{BUILD_FRONT}}'
@@ -63,12 +68,57 @@ if [ -n "$planes" ]; then
   done
 fi
 
-if [ -n "$FICHAS_DIR" ] && [ -d "$FICHAS_DIR" ]; then
-  borr=$(grep -lE '^> *\*\*Estado:\*\* *Borrador' "$FICHAS_DIR"/*.md 2>/dev/null)
-  if [ -n "$borr" ]; then
-    echo "-- Fichas en Borrador (pendientes de aprobar por el usuario)"
-    echo "$borr" | head -10 | sed 's/^/  ..  /'
+# ---- Arnés fuera de git (solo modo privado)
+if [ "$MODO" = privado ]; then
+  echo "-- Arnés excluido de git (modo privado)"
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    avi "la raíz no es repo: el arnés de la raíz ya queda fuera de git"
+  else
+    vis=0; lista=""
+    for f in CLAUDE.md AGENTS.md progress.md Resumen.md init.sh .claude plan-implementacion-*.md \
+             "$MEMORIA_DST" "$FICHAS_BORRADORES" "$ADR_BORRADORES"; do
+      [ -n "$f" ] && [ -e "$f" ] || continue
+      [ "$f" = "$FICHAS_DIR" ] || [ "$f" = "$ADR_DIR" ] && continue
+      # visible = versionado, o sin versionar y no ignorado
+      if [ -n "$(git ls-files -- "$f" | head -1)" ] || ! git check-ignore -q -- "$f"; then
+        vis=$((vis+1)); lista="$lista $f"
+      fi
+    done
+    if [ $vis = 0 ]; then ok "ningún archivo del arnés es visible para git"
+    else mal "$vis archivo(s) del arnés visibles para git (revisar .git/info/exclude):$lista"; fi
   fi
+fi
+
+# ---- Fichas y ADR
+estado_de(){ grep -m1 -E '^> *\*\*Estado:\*\*' "$1" | sed -E 's/^> *\*\*Estado:\*\* *//' | cut -c1-40; }
+PREF_RE=$(printf '%s\n' $PREFIJOS_FICHA EVO | grep . | sort -u | paste -sd'|' -)
+if { [ -n "$FICHAS_DIR" ] && [ -d "$FICHAS_DIR" ]; } || { [ -n "$ADR_DIR" ] && [ -d "$ADR_DIR" ]; }; then
+  echo "-- Fichas y ADR"
+  separados=0; [ "$FICHAS_BORRADORES" != "$FICHAS_DIR" ] && separados=1
+  for f in "$FICHAS_DIR"/*.md; do
+    [ -e "$f" ] || continue
+    n=$(basename "$f"); est=$(estado_de "$f")
+    echo "$n" | grep -qiE "^($PREF_RE)-" || avi "$n: prefijo fuera de PREFIJOS_FICHA ($PREFIJOS_FICHA)"
+    case "$est" in
+      Aprobad*) ;;
+      *) if [ $separados = 1 ]; then mal "$FICHAS_DIR/$n está en '${est:-sin estado}': ahí solo van fichas Aprobadas (el borrador va en $FICHAS_BORRADORES)"
+         else avi "$n — ${est:-sin estado} (pendiente de aprobar)"; fi;;
+    esac
+  done
+  for f in "$ADR_DIR"/*.md; do
+    [ -e "$f" ] || continue
+    n=$(basename "$f"); est=$(estado_de "$f")
+    case "$est" in
+      Aceptad*|Sustituid*|Obsolet*) ;;
+      *) if [ "$ADR_BORRADORES" != "$ADR_DIR" ]; then mal "$ADR_DIR/$n está en '${est:-sin estado}': ahí solo van ADR aceptados (el propuesto va en $ADR_BORRADORES)"
+         else avi "ADR $n — ${est:-sin estado} (pendiente de aceptar)"; fi;;
+    esac
+  done
+  for d in "$FICHAS_BORRADORES" "$ADR_BORRADORES"; do
+    [ -n "$d" ] && [ -d "$d" ] || continue
+    [ "$d" = "$FICHAS_DIR" ] || [ "$d" = "$ADR_DIR" ] && continue
+    for f in "$d"/*.md; do [ -e "$f" ] && avi "borrador pendiente de aprobar: $f"; done
+  done
 fi
 
 echo "-- progress.md"
