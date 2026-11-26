@@ -4,6 +4,7 @@
 
 ## Tarea actual
 Arnés de trabajo instalado. Sin tarea en curso.
+Ficha: —
 
 ## Hecho
 - [x] Arnés instalado ({{FECHA}}): `AGENTS.md`, `CLAUDE.md`, `init.sh`, agentes, memoria

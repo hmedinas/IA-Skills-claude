@@ -23,4 +23,4 @@
 
 ## 6. Bitácora
 ### {{FECHA}}
-- Arnés de trabajo instalado (skill `arnes_trabajo`): `AGENTS.md`, `CLAUDE.md`, `progress.md`, `init.sh`, `.claude/`, `doc/agentes/memoria/`.
+- Arnés de trabajo instalado (skill `arnes_trabajo`): `AGENTS.md`, `CLAUDE.md`, `progress.md`, `init.sh`, `.claude/`, `doc/agentes/memoria/`, `{{FICHAS_DIR}}/` y `{{ADR_DIR}}/`.

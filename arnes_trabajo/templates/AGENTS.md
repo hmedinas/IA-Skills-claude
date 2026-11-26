@@ -19,6 +19,8 @@
 | `plan-implementacion-<modulo>.md` | Plan por etapas con estado, casillas `[x]` y gates | Al aprobarlo y al cerrar cada etapa |
 | `CLAUDE.md` | Reglas de código, SQL y estilo | Solo si el usuario cambia una regla |
 | `doc/agentes/memoria/` | Copia versionada de la memoria del agente (decisiones del usuario) | Con `bash init.sh --sync-memoria` |
+| `{{FICHAS_DIR}}/TCK-…`, `REQ-…`, `EVO-…` | Ficha de requerimiento de cada tarea: objetivo, decisiones, commits, pruebas, pendientes | Al cerrar cada tarea (§4) |
+| `{{ADR_DIR}}/NNNN-….md` | Decisiones de arquitectura que perduran (ADR) | Cuando el usuario acepta convertir una decisión en ADR |
 {{DOCS_TABLA}}
 
 ### Planes de implementación
@@ -69,8 +71,12 @@ Flujo: `Orquestador (diseño acordado con el usuario) → Implementador (encargo
 1. Builds en verde, o decir exactamente qué falla.
 2. Revisor (si se usó) sin hallazgos abiertos.
 3. `progress.md`, `Resumen.md`, el plan y los documentos del módulo actualizados.
-4. Resumen al usuario con:
+4. **Ficha de requerimiento** creada o actualizada en `{{FICHAS_DIR}}/`, en estado **Borrador** hasta que el usuario la apruebe:
+   - nombre `TCK-<n>-<titulo>.md` (ticket), `REQ-<n>-<titulo>.md` (requerimiento) o `EVO-<id>-<titulo>.md` (evolutivo, `<id>` = 8 hex aleatorios);
+   - sin credenciales, datos de producción, nombres de servidor ni conversación en bruto;
+   - si una decisión perdura, se propone como ADR en `{{ADR_DIR}}/`.
+5. Resumen al usuario con:
    - qué cambió;
    - qué scripts debe ejecutar y en qué orden;
-   - qué documentos se tocaron;
+   - qué documentos se tocaron, incluida la ficha;
    - qué se verificó y qué no.

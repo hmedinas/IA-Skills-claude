@@ -58,7 +58,7 @@ Devuelve una tabla: línea · problema · corrección. Si no hay fallos, dilo.
 
 ## Ejemplo real
 `arnes_trabajo/` en este repositorio: `SKILL.md` con cinco modos (`instalar`, `revisar`, `diseno`, `implementar`, `cierre`)
-y una carpeta `templates/` con lo que copia al proyecto.
+y una carpeta `templates/` con lo que copia al proyecto. Cómo se usa: [07 · Arnés de trabajo](07-arnes-trabajo.md).
 
 ## Cómo se instala
 - **A mano:** copiar la carpeta a `~/.claude/skills/` (personal) o a `<proyecto>/.claude/skills/` (proyecto).

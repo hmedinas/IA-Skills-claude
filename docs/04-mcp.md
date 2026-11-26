@@ -31,10 +31,10 @@ Formato de `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "nexus-db": {
+    "mi-bd": {
       "command": "dotnet",
-      "args": ["run", "--project", "C:/ruta/NexusDbMcp"],
-      "env": { "NEXUSDB_CONEXION_ARCHIVO": "C:/Users/yo/.secretos/nexusdb.txt" }
+      "args": ["run", "--project", "C:/ruta/MiBdMcp"],
+      "env": { "MIBD_CONEXION_ARCHIVO": "C:/Users/yo/.secretos/mi-bd.txt" }
     }
   }
 }
@@ -43,10 +43,10 @@ Formato de `.mcp.json`:
 
 ## Comandos útiles
 ```bash
-claude mcp add nexus-db -- dotnet run --project C:/ruta/NexusDbMcp        # stdio
+claude mcp add mi-bd -- dotnet run --project C:/ruta/MiBdMcp        # stdio
 claude mcp add --transport http mi-api https://ejemplo.com/mcp             # http
 claude mcp list                                                            # listar y ver el estado
-claude mcp remove nexus-db
+claude mcp remove mi-bd
 ```
 Dentro de la sesión, `/mcp` muestra los servidores conectados, sus herramientas y permite autenticar.
 

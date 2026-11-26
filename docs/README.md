@@ -1,6 +1,6 @@
 # Guías — Cómo se crea y se instala cada componente de Claude Code
 
-> Chuleta personal para no olvidar cómo se hace cada cosa. Cada guía tiene las mismas secciones:
+> Guías para crear e instalar cada tipo de componente, y para usar los de este repositorio. Cada guía tiene las mismas secciones:
 > **qué es · cuándo usarlo · dónde vive · cómo se crea · ejemplo real · cómo se instala · errores típicos**.
 > Verificado contra la documentación oficial (Claude Code 2.1.x, noviembre 2026).
 
@@ -14,6 +14,7 @@
 | **MCP** | Un programa que le da a Claude herramientas nuevas (tu BD, Jira, Azure DevOps…) | Proceso aparte, registrado en `.mcp.json` | [04](04-mcp.md) |
 | **Plugin** | Un paquete con skills, agentes, hooks y MCP, que se instala de una vez | Repo con `.claude-plugin/` | [05](05-plugins-y-marketplace.md) |
 | **Settings y modos** | Permisos, modo de trabajo (pedir permiso, editar solo, solo planificar) y estilo de respuesta | `settings.json`, `Shift+Tab` | [06](06-settings-y-modos.md) |
+| **Arnés de trabajo** | La skill `arnes_trabajo`: instalación, los cinco modos, el cierre y la ficha de requerimiento | Tu proyecto (`AGENTS.md`, `init.sh`, `doc/fichas/`…) | [07](07-arnes-trabajo.md) |
 
 ## ¿Cuál necesito?
 
@@ -39,10 +40,10 @@
 
 | Componente | Tipo | Instalar |
 |---|---|---|
-| `arnes_trabajo` | Skill (incluye todo el arnés) | `claude plugin install arnes_trabajo@ia-skills-claude` |
+| `arnes_trabajo` | Skill (incluye todo el arnés). Guía: [07](07-arnes-trabajo.md) | `claude plugin install arnes_trabajo@ia-skills-claude` |
 | `agente_implementador` | Agente | `claude plugin install agente_implementador@ia-skills-claude` |
 | `agente_revisor` | Agente | `claude plugin install agente_revisor@ia-skills-claude` |
-| `hook_inicio_sesion` | Hook `SessionStart` | `claude plugin install hook_inicio_sesion@ia-skills-claude` |
+| `hook_inicio_sesion` | Hook `SessionStart` (no hace falta si usas `arnes_trabajo`) | `claude plugin install hook_inicio_sesion@ia-skills-claude` |
 | `hook_solo_select` | Hook `PreToolUse` | `claude plugin install hook_solo_select@ia-skills-claude` |
 | `mcp_sql_lectura` | MCP (C#, SQL Server solo lectura) | `claude plugin install mcp_sql_lectura@ia-skills-claude` |
 | `base_net10`, `base_nuxt4`, `base_flutter` | Skills generadoras | `claude plugin install <nombre>@ia-skills-claude` |

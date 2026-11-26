@@ -1,5 +1,6 @@
 # Plan de implementación — {{MODULO}}
 > Creado: {{FECHA}}
+> Ficha: (se rellena en el primer cierre: `{{FICHAS_DIR}}/TCK-…`, `REQ-…` o `EVO-…`)
 > **Estado:** Borrador
 > Estados posibles: Borrador → En revisión → **Aprobado** (solo el usuario) → En curso → Implementado / Obsoleto.
 > Aprobación: (vacío hasta que el usuario apruebe. Si lo hace en el chat: `Aprobado por el usuario en chat AAAA-MM-DD: "<sus palabras>"`)

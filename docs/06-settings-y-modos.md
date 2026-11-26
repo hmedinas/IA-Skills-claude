@@ -23,7 +23,7 @@ modelo y más. Se combinan por niveles; manda el más específico.
 }
 ```
 - `allow`: sin preguntar. `ask`: siempre pregunta. `deny`: nunca.
-- Formato de regla: `Herramienta(patrón)`, p. ej. `Bash(npm run test:*)`, `Edit(src/**)`, `mcp__nexus-db__consultar`.
+- Formato de regla: `Herramienta(patrón)`, p. ej. `Bash(npm run test:*)`, `Edit(src/**)`, `mcp__mi-bd__consultar`.
 - Atajos: `/permissions` para verlos y editarlos; `/config` para el resto de opciones.
 - `deny` es una barrera de configuración; para reglas con lógica (p. ej. "solo SELECT") usa un [hook](03-hooks.md).
 

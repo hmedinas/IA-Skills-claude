@@ -1,6 +1,6 @@
 ---
 name: arnes_trabajo
-description: Arnés de trabajo con agentes para cualquier proyecto (Claude Code, Cursor u otro LLM). Instala o revisa AGENTS.md, CLAUDE.md, progress.md, Resumen.md, init.sh con hook SessionStart, agentes implementador/revisor, memoria versionada y planes por etapas con aprobación humana; guía el diseño de un módulo (preguntas en bloques → plan en Borrador), la implementación por etapas con gate y el cierre documentado. Úsala cuando el usuario pida montar, preparar, revisar o copiar "el arnés" o "la forma de trabajar" en un proyecto, diseñar un módulo o funcionalidad grande antes de programarla, implementar un plan aprobado o cerrar una tarea con su documentación. Pensada para proyectos multi-repo, con base de datos de solo lectura y commits solo a petición.
+description: Arnés de trabajo con agentes para cualquier proyecto (Claude Code, Cursor u otro LLM). Instala o revisa AGENTS.md, CLAUDE.md, progress.md, Resumen.md, init.sh con hook SessionStart, agentes implementador/revisor, memoria versionada y planes por etapas con aprobación humana; guía el diseño de un módulo (preguntas en bloques → plan en Borrador), la implementación por etapas con gate y el cierre documentado con ficha de requerimiento (TCK/REQ/EVO) y ADR. Úsala cuando el usuario pida montar, preparar, revisar o copiar "el arnés" o "la forma de trabajar" en un proyecto, diseñar un módulo o funcionalidad grande antes de programarla, implementar un plan aprobado o cerrar una tarea con su documentación o su ficha de requerimiento. Pensada para proyectos multi-repo, con base de datos de solo lectura y commits solo a petición.
 argument-hint: "[instalar | revisar | diseno <modulo> | implementar <modulo> | cierre]"
 ---
 
@@ -12,7 +12,7 @@ Monta y aplica una forma de trabajar estable entre sesiones y entre herramientas
 - **reglas escritas:** `CLAUDE.md` y `AGENTS.md`;
 - **roles:** orquestador, implementador y revisor;
 - **planes por etapas** con aprobación humana y gate de verificación;
-- **cierre documentado** sin que el usuario tenga que pedirlo.
+- **cierre documentado** sin que el usuario tenga que pedirlo, con una **ficha de requerimiento** por tarea y ADR para las decisiones que perduran.
 
 Las plantillas están en `templates/` (junto a este archivo). Los marcadores `{{ASI}}` los rellena la skill con
 lo que detecta en el proyecto y lo que responde el usuario.
@@ -25,7 +25,7 @@ lo que detecta en el proyecto y lo que responde el usuario.
 | `/arnes_trabajo revisar` | Comprueba un arnés existente y propone lo que falte, sin pisar nada |
 | `/arnes_trabajo diseno <modulo>` | Preguntas en bloques → `plan-implementacion-<modulo>.md` en estado **Borrador**. No programa |
 | `/arnes_trabajo implementar <modulo>` | Ejecuta un plan **Aprobado**, etapa por etapa, con gate y pausa |
-| `/arnes_trabajo cierre` | Lista de cierre: builds, documentos, scripts pendientes, resumen al usuario |
+| `/arnes_trabajo cierre` | Lista de cierre: builds, documentos, scripts pendientes, **ficha de requerimiento** en Borrador y resumen al usuario |
 
 Sin argumento: si el proyecto no tiene `AGENTS.md`, proponer `instalar`. Si lo tiene, ejecutar `revisar` y
 preguntar qué quiere hacer.
@@ -75,11 +75,17 @@ preguntar qué quiere hacer.
   Solo se anota que existen; **nunca se copian credenciales**.
 - **Memoria del agente:** `~/.claude/projects/<clave>/memory/`. La clave es la ruta absoluta del proyecto con cada carácter
   no alfanumérico cambiado por `-`.
+- **Fichas y ADR existentes:** carpetas como `doc/fichas/`, `doc/requerimientos/`, `doc/adr/`, `docs/decisions/`. Si ya hay una, se propone esa.
+- **Plugin `hook_inicio_sesion`:** buscar `hook_inicio_sesion@` en `enabledPlugins` de `~/.claude/settings.json` y de
+  `.claude/settings.json` (o la salida de `claude plugin list`). Ese plugin **también** ejecuta `init.sh` al arrancar: si está
+  activo y el arnés añade su hook, `init.sh` se ejecuta **dos veces** en cada sesión. Ver el paso 3 de *Generar*.
 
 ### 2. Preguntar en bloques (solo lo que no se pudo detectar)
 Usar la herramienta de preguntas con 3–4 preguntas por bloque, con lo detectado como opción recomendada. Parar en
 cuanto se pueda rellenar la plantilla.
 - **Bloque A, proyecto:** nombre, idioma, repos detectados (confirmar), quién hace commit/push.
+- **Bloque A2, fichas:** carpeta destino de las fichas de requerimiento (por defecto `doc/fichas`) y de los ADR (por defecto `doc/adr`).
+  Por ahora el destino es siempre una carpeta de `.md`; la integración con un gestor de tickets queda para más adelante.
 - **Bloque B, verificación:** comando de build de cada parte, servidores que el usuario tiene abiertos (puertos) y que no hay que arrancar.
 - **Bloque C, datos:** si hay BD; si el acceso del agente es de solo lectura; carpeta y numeración de scripts; quién los ejecuta.
 - **Bloque D, reglas propias:**
@@ -93,9 +99,13 @@ cuanto se pueda rellenar la plantilla.
 2. Crear desde `templates/`, sustituyendo los marcadores (tabla al final). Lo que no aplique **se borra**: no se dejan marcadores ni secciones vacías.
    - `AGENTS.md`, `CLAUDE.md`, `progress.md`, `Resumen.md` y `init.sh` van en la raíz.
    - `settings.json` va en `.claude/settings.json`. Si ya existe, **añadir** el hook `SessionStart` sin quitar nada.
+     Si el plugin `hook_inicio_sesion` está activo, **avisar** de que `init.sh` se ejecutaría dos veces y preguntar qué prefiere:
+     quitar el plugin (`claude plugin uninstall hook_inicio_sesion@ia-skills-claude`, recomendado si el proyecto se comparte) o no añadir el hook al proyecto.
    - `agents/implementador.md` y `agents/revisor.md` van en `.claude/agents/`.
    - `memoria/MEMORY.md` va en `doc/agentes/memoria/MEMORY.md`.
    - `plan-implementacion.md` **no se copia** al instalar: es la plantilla del modo `diseno`.
+   - `ficha-requerimiento.md` y `adr.md` **no se copian**: son las plantillas del modo `cierre`. Las carpetas `{{FICHAS_DIR}}/` y
+     `{{ADR_DIR}}/` se crean vacías (con un `.gitkeep`).
 3. Respetar el fin de línea dominante del proyecto en los `.md`. `init.sh` siempre con LF.
 4. Ejecutar `bash init.sh` y corregir lo que marque.
 5. Guardar en la memoria del agente una nota breve: "arnés instalado AAAA-MM-DD, reglas clave X/Y/Z".
@@ -115,6 +125,9 @@ cuanto se pueda rellenar la plantilla.
    - ¿`progress.md` tiene menos de 60 líneas?
    - ¿los planes tienen estado?
    - ¿hay reglas de `.cursor/rules` que no estén en `CLAUDE.md`?
+   - ¿el hook usa la forma robusta (`"shell": "bash"` y `"${CLAUDE_PROJECT_DIR:-.}/init.sh"`)? Si sigue con `bash init.sh` a secas, proponer el cambio;
+   - ¿está activo también el plugin `hook_inicio_sesion`? Entonces `init.sh` se ejecuta dos veces: avisar (ver `instalar`);
+   - ¿existen la carpeta de fichas y la de ADR, y hay fichas en **Borrador** pendientes de aprobar?
 3. Informar en una tabla: falta, sobra, desactualizado. Proponer parches concretos y aplicarlos **solo con OK**.
 4. Si `progress.md` supera 60 líneas, proponer pasar lo histórico a la bitácora de `Resumen.md`.
 
@@ -186,13 +199,57 @@ Se aplica al terminar **cualquier** tarea que cambie el producto, use o no el mo
    - `Resumen.md`: fecha, sección del módulo, decisiones, scripts y si están ejecutados, pendientes y entrada de bitácora `AAAA-MM-DD`;
    - el plan: `[x]`, gate y registro de avance;
    - los documentos que dependan del cambio (resumen de API, manual de usuario, roadmap).
-4. Si hubo decisiones o preferencias nuevas del usuario, guardarlas en la memoria del agente y recordar `bash init.sh --sync-memoria`.
-5. Responder al usuario con:
+4. **Ficha de requerimiento**, siempre (ver la sección siguiente).
+5. Si una decisión perdura más allá de la tarea (arquitectura, convención, librería, regla de negocio), **proponer** convertirla en ADR.
+   Solo se escribe si el usuario acepta: `{{ADR_DIR}}/NNNN-titulo.md` desde `templates/adr.md`, en estado **Propuesto**, y se enlaza en la ficha.
+6. Si hubo decisiones o preferencias nuevas del usuario, guardarlas en la memoria del agente y recordar `bash init.sh --sync-memoria`.
+7. Responder al usuario con:
    - qué cambió;
    - qué scripts debe ejecutar y en qué orden;
-   - qué documentos se actualizaron;
+   - qué documentos se actualizaron, con la ruta de la ficha y su estado (**Borrador**, pendiente de su aprobación);
+   - los ADR propuestos, si hay;
    - qué se verificó y qué no;
    - que no hay commit, salvo que lo pidiera.
+
+### Ficha de requerimiento
+Cada tarea cerrada deja una ficha en `{{FICHAS_DIR}}/`, creada desde `templates/ficha-requerimiento.md`. Es lo que lee quien llegue
+después (otra persona del equipo u otro agente) para saber qué se pidió, qué se decidió, qué se tocó y qué falta.
+
+**Nombre del archivo** (`<titulo>` en minúsculas, sin tildes, con guiones, máximo ~50 caracteres):
+
+| La tarea tiene… | Archivo | Ejemplo |
+|---|---|---|
+| Un ticket asignado | `TCK-<número>-<titulo>.md` | `TCK-123-error-al-exportar-pdf.md` |
+| Un requerimiento | `REQ-<número>-<titulo>.md` | `REQ-123-alta-de-proveedores.md` |
+| Ninguno de los dos (evolutivo) | `EVO-<id>-<titulo>.md` | `EVO-9f3a61c2-filtro-por-fecha.md` |
+
+- El número de ticket o requerimiento sale del plan, de `progress.md`, del nombre de la rama o del mensaje del usuario. Si no está claro,
+  **preguntar una vez** (ticket, requerimiento o evolutivo). No inventar números.
+- El `<id>` de un evolutivo son 8 caracteres hexadecimales aleatorios, para que no choque con el de otra persona del equipo:
+  `od -An -N4 -tx1 /dev/urandom | tr -d ' \n'` (o `openssl rand -hex 4`). Se comprueba que no exista ya en `{{FICHAS_DIR}}/`.
+  No se usa el hash de un commit porque al cerrar puede no haber commit todavía y una tarea puede tener varios; los commits van dentro de la ficha.
+- Al crearla, la ruta se anota en el plan (cabecera) y en `progress.md` (`Ficha: …`), para encontrarla en el siguiente cierre.
+
+**Crear o actualizar:**
+- Si ya existe una ficha con ese ID, se **actualiza**: se parchean las secciones, se añade una línea al historial y, si estaba *Aprobada*,
+  vuelve a **Borrador** con el motivo.
+- Si no existe, se crea en **Borrador** con la fecha del sistema.
+
+**Cómo se rellena** (sin inventar nada: lo que no se sepa se deja como pendiente o se pregunta):
+- **Objetivo, contexto, decisiones y descartes:** del plan (`Objetivo`, `Decisiones`, `Fuera de alcance`) o, si no hay plan, de lo acordado en la sesión.
+- **Qué se cambió:** por cada repo, `git -C <repo> branch --show-current`, `git -C <repo> log --oneline` de la tarea y `git -C <repo> status --short`.
+  Si no hay commit, se escribe "sin commit todavía" y los archivos tocados.
+- **Qué se ejecutó y dónde, pruebas y resultado:** de los gates, de `init.sh --build` y de lo que el usuario confirmó. Lo no probado va a *No verificado*.
+- **Hallazgos y pendientes:** de `progress.md` y del plan (*Pendiente para siguiente versión*).
+
+**Filtro antes de guardar** (obligatorio, porque la ficha se comparte y se versiona):
+- sin credenciales, tokens, claves ni cadenas de conexión;
+- sin datos de producción: filas reales, nombres, correos o importes de personas o clientes;
+- sin nombres de servidor, IPs internas ni rutas de máquinas concretas (se dice "entorno de pruebas", no su nombre);
+- sin conversación en bruto: se resume lo decidido.
+
+**Aprobación:** la ficha queda en **Borrador** hasta que el usuario la apruebe (mismas reglas que los planes, principio 4).
+El agente nunca la marca como *Aprobada* por su cuenta.
 
 ---
 
@@ -200,32 +257,47 @@ Se aplica al terminar **cualquier** tarea que cambie el producto, use o no el mo
 
 | Marcador | Qué es | Ejemplo |
 |---|---|---|
-| `{{PROYECTO}}` | Nombre del proyecto | `Nexus Change` |
+| `{{PROYECTO}}` | Nombre del proyecto | `Gestor de Pedidos` |
 | `{{IDIOMA}}` | Idioma de trabajo | `español` |
 | `{{FECHA}}` | Fecha de instalación `AAAA-MM-DD` | `2026-11-22` |
 | `{{STACK_TABLA}}` | Filas `\| Capa \| Stack \| Carpeta \|` | `\| API \| .NET 10, MediatR, Dapper \| Backend/ \|` |
-| `{{REPOS}}` | Carpetas repo separadas por espacio (`.` = raíz) | `Backend Nexus_Change` |
-| `{{REPOS_TEXTO}}` | Frase sobre repos y raíz | `Dos repos (Backend/, Nexus_Change/); la raíz no es repo` |
-| `{{REQUERIDOS}}` | Archivos clave extra que `init.sh` comprueba | `Backend/Nexus_change.slnx Nexus_Change/nuxt.config.ts` |
+| `{{REPOS}}` | Carpetas repo separadas por espacio (`.` = raíz) | `Backend Frontend` |
+| `{{REPOS_TEXTO}}` | Frase sobre repos y raíz | `Dos repos (Backend/, Frontend/); la raíz no es repo` |
+| `{{REQUERIDOS}}` | Archivos clave extra que `init.sh` comprueba | `Backend/GestorPedidos.slnx Frontend/nuxt.config.ts` |
 | `{{NO_TOCAR}}` | Carpetas de otras herramientas | `.cursor/rules` |
+| `{{FICHAS_DIR}}` | Carpeta de fichas de requerimiento | `doc/fichas` |
+| `{{ADR_DIR}}` | Carpeta de ADR | `doc/adr` |
 | `{{SCRIPTS_DIR}}` | Carpeta de scripts de BD (vacío si no hay) | `Script` |
 | `{{SCRIPT_PATRON}}` | Patrón de nombre | `NN-accion-Objeto-descripcion.sql` |
 | `{{BD_TEXTO}}` | Regla de BD acordada | `solo SELECT con el login de lectura que indique el usuario` |
 | `{{BUILD_BACK}}` / `{{BUILD_FRONT}}` | Comando de build a carpeta temporal `$OUT` (vacío = no) | `dotnet build Backend/X.slnx -nologo -v q -p:OutDir="$OUT/back/"` |
 | `{{VERIFICACION_TEXTO}}` | Cómo se verifica cada parte, con sus límites | — |
-| `{{ENTORNO_TEXTO}}` | Servidores que ya tiene abiertos el usuario | `API en VS :7209, front dev :3000` |
+| `{{ENTORNO_TEXTO}}` | Servidores que ya tiene abiertos el usuario | `API en el IDE :5001, front dev :3000` |
 | `{{REGLAS_PROPIAS}}` | Bullets con reglas del bloque D | `- UI: nada de text-xs` |
-| `{{MEMORIA_EXCLUIR}}` | Notas privadas que no se copian | `revision-semestral-gxo.md` |
+| `{{MEMORIA_EXCLUIR}}` | Notas privadas que no se copian | `notas-personales.md` |
 | `{{DOCS_TABLA}}` | Filas extra de documentos del proyecto | `\| Backend/api_resumen.md \| Endpoints \| Al cambiar un Controller \|` |
+
+Plantillas del modo `cierre` (se rellenan al crear cada ficha o ADR, no al instalar):
+
+| Marcador | Qué es | Ejemplo |
+|---|---|---|
+| `{{FICHA_ID}}` | ID de la ficha | `TCK-123`, `REQ-45`, `EVO-9f3a61c2` |
+| `{{FICHA_TIPO}}` | Ticket, Requerimiento o Evolutivo | `Ticket` |
+| `{{TITULO}}` | Título corto de la tarea o del ADR | `Error al exportar PDF` |
+| `{{PLAN}}` | Plan relacionado o `—` | `plan-implementacion-exportar.md` |
+| `{{REFERENCIA}}` | Enlace o código en el gestor de tickets, o `—` | `TCK-123` |
+| `{{NNNN}}` | Número del ADR (mayor existente + 1) | `0003` |
 
 ## Referencia
 
-- **Origen:** este arnés se probó en proyectos .NET 10 + Nuxt 4 con dos repos, raíz sin git y BD de producción de solo lectura.
+- **Origen:** este arnés se probó en proyectos .NET 10 + Nuxt 4 con dos repos, raíz sin git y BD de solo lectura. Sirve para cualquier stack.
 - **Ideas incorporadas del flujo *spec-driven*:**
   - aprobación humana como única puerta;
   - plantilla con objetivo, fuera de alcance, decisiones descartadas y criterios comprobables;
   - preguntas en bloques;
   - pausa por etapa.
+- **Destino de las fichas:** hoy, una carpeta de `.md` en el repo. Está previsto poder enviarlas a un gestor de tickets; hasta entonces,
+  la ficha aprobada se puede copiar o enlazar desde el ticket.
 - **Ideas descartadas a propósito:** rama automática por plan, commits automáticos por paso, y bloquear el trabajo si hay cambios sin commit.
 - **Skills compatibles:** `base_net10`, `base_nuxt4` y `base_flutter` generan el código del proyecto. Esta skill solo define la forma de trabajar.
   Tras generar un proyecto con ellas, ejecutar `/arnes_trabajo instalar`.

@@ -14,6 +14,8 @@ NO_TOCAR="{{NO_TOCAR}}"           # reglas de otras herramientas: se avisa de qu
 SCRIPTS_DIR="{{SCRIPTS_DIR}}"     # carpeta de scripts de BD numerados; vacío si no hay BD
 MEMORIA_EXCLUIR="{{MEMORIA_EXCLUIR}}"  # notas de memoria privadas que no se copian al repo
 MEMORIA_DST="doc/agentes/memoria"
+FICHAS_DIR="{{FICHAS_DIR}}"       # fichas de requerimiento (TCK-/REQ-/EVO-*.md)
+ADR_DIR="{{ADR_DIR}}"             # decisiones de arquitectura (NNNN-*.md)
 # Builds de verificación: siempre a "$OUT" (carpeta temporal) para no pisar lo que el usuario tiene abierto.
 BUILD_BACK='{{BUILD_BACK}}'
 BUILD_FRONT='{{BUILD_FRONT}}'
@@ -29,7 +31,7 @@ echo "== $PROYECTO init ($(date '+%d/%m/%Y %H:%M'))"
 
 echo "-- Estructura"
 for f in AGENTS.md CLAUDE.md progress.md Resumen.md .claude/settings.json .claude/agents/implementador.md \
-         .claude/agents/revisor.md "$MEMORIA_DST/MEMORY.md" $SCRIPTS_DIR $REQUERIDOS; do
+         .claude/agents/revisor.md "$MEMORIA_DST/MEMORY.md" $FICHAS_DIR $ADR_DIR $SCRIPTS_DIR $REQUERIDOS; do
   [ -e "$f" ] && ok "$f" || mal "falta $f"; done
 for d in $NO_TOCAR; do [ -e "$d" ] && ok "$d (no tocar)"; done
 
@@ -59,6 +61,14 @@ if [ -n "$planes" ]; then
     est=$(grep -m1 -iE '^\*\*Estado:\*\*|^> *Estado:|^\*\*Status:\*\*' "$p" | sed -E 's/.*(Estado|Status):\**[: ]*//I' | cut -c1-80)
     avi "$p — ${est:-sin línea de estado}"
   done
+fi
+
+if [ -n "$FICHAS_DIR" ] && [ -d "$FICHAS_DIR" ]; then
+  borr=$(grep -lE '^> *\*\*Estado:\*\* *Borrador' "$FICHAS_DIR"/*.md 2>/dev/null)
+  if [ -n "$borr" ]; then
+    echo "-- Fichas en Borrador (pendientes de aprobar por el usuario)"
+    echo "$borr" | head -10 | sed 's/^/  ..  /'
+  fi
 fi
 
 echo "-- progress.md"

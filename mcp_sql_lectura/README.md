@@ -29,7 +29,7 @@ Guía del tipo de componente: [docs/04-mcp.md](../docs/04-mcp.md).
 - SDK de .NET 10 (`dotnet --list-sdks`).
 - Un archivo de texto **fuera de cualquier repositorio** con la cadena de conexión en una línea. Las líneas que empiezan por `#` se ignoran:
   ```text
-  # C:\Users\<tú>\.secretos\nexus-lectura.txt
+  # C:\Users\<tú>\.secretos\bd-lectura.txt
   Server=servidor,puerto;Database=MiBase;User Id=login_lectura;Password=***;TrustServerCertificate=true
   ```
 
@@ -43,16 +43,16 @@ Al activarlo, Claude Code pide el **archivo de conexión**, el máximo de filas 
 La primera conexión tarda más porque compila el proyecto.
 
 ### Opción B: a mano, por proyecto (recomendado si cada proyecto usa una BD distinta)
-Desde la carpeta del proyecto, con el nombre que quieras para el servidor (p. ej. `nexus-db`):
+Desde la carpeta del proyecto, con el nombre que quieras para el servidor (p. ej. `mi-bd`):
 ```bash
-claude mcp add nexus-db --scope local \
-  -e MCP_SQL_CONEXION_ARCHIVO="C:/Users/<tú>/.secretos/nexus-lectura.txt" \
+claude mcp add mi-bd --scope local \
+  -e MCP_SQL_CONEXION_ARCHIVO="C:/Users/<tú>/.secretos/bd-lectura.txt" \
   -e DOTNET_NOLOGO=1 \
   -- dotnet run --project "C:/ruta/IA-Skills-claude/mcp_sql_lectura/src/McpSqlLectura" -c Release -v q --nologo -p:NuGetAudit=false
 ```
 `--scope local` lo deja solo para ti en ese proyecto: no se sube a git.
 
-Comprobar: `/mcp` → `nexus-db · connected` y las 5 herramientas.
+Comprobar: `/mcp` → `mi-bd · connected` y las 5 herramientas.
 
 ## Variables de entorno
 | Variable | Por defecto | Qué es |

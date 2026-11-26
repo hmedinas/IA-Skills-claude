@@ -16,14 +16,14 @@ claude plugin install <componente>@ia-skills-claude
 - **base_net10**: genera un backend .NET 10 (Clean Architecture 6 capas, MediatR, Dapper, JWT, Serilog, Swagger).
 - **base_nuxt4**: genera un starter Nuxt 4 (PrimeVue + Tailwind + Pinia, login mock, theming, dark mode).
 - **base_flutter**: genera una app Flutter (Clean Architecture feature-first, Provider o Riverpod, Dio + mocks, theming, routing, login).
-- **arnes_trabajo**: arnés de trabajo con agentes. Instala o revisa AGENTS.md, CLAUDE.md, progress.md, Resumen.md, init.sh (hook SessionStart), los agentes y la memoria. También diseña planes por etapas con aprobación humana, los implementa con gates y cierra documentando. Uso: `/arnes_trabajo instalar | revisar | diseno <modulo> | implementar <modulo> | cierre`.
+- **arnes_trabajo**: arnés de trabajo con agentes. Instala o revisa AGENTS.md, CLAUDE.md, progress.md, Resumen.md, init.sh (hook SessionStart), los agentes y la memoria. También diseña planes por etapas con aprobación humana, los implementa con gates y cierra documentando, con una **ficha de requerimiento** por tarea (`TCK-`/`REQ-`/`EVO-`) y ADR para las decisiones que perduran. Uso: `/arnes_trabajo instalar | revisar | diseno <modulo> | implementar <modulo> | cierre`. [Guía](docs/07-arnes-trabajo.md)
 
 ### Agentes
 - **agente_implementador**: ejecuta un encargo concreto siguiendo AGENTS.md y CLAUDE.md y deja los builds en verde (Sonnet). [README](agente_implementador/README.md)
 - **agente_revisor**: revisa el diff (solo lectura) buscando bugs, seguridad y reglas rotas (Opus). [README](agente_revisor/README.md)
 
 ### Hooks
-- **hook_inicio_sesion**: `SessionStart`; ejecuta el `init.sh` del proyecto si existe. [README](hook_inicio_sesion/README.md)
+- **hook_inicio_sesion**: `SessionStart`; ejecuta el `init.sh` del proyecto si existe. **No hace falta si usas `arnes_trabajo`**, que ya instala ese hook. [README](hook_inicio_sesion/README.md)
 - **hook_solo_select**: `PreToolUse`; bloquea comandos SQL que no sean SELECT (sqlcmd, Invoke-Sqlcmd, psql, mysql…). [README](hook_solo_select/README.md)
 
 ### MCP
@@ -38,6 +38,8 @@ claude plugin install <componente>@ia-skills-claude
 | [03 · Hooks](docs/03-hooks.md) | Eventos, códigos de salida, bloquear acciones |
 | [04 · MCP](docs/04-mcp.md) | Servidores de herramientas; ejemplo en C# |
 | [05 · Plugins y marketplace](docs/05-plugins-y-marketplace.md) | Empaquetar, validar y publicar |
+| [06 · Settings y modos](docs/06-settings-y-modos.md) | Permisos, modos de trabajo y estilo de respuesta |
+| [07 · Arnés de trabajo](docs/07-arnes-trabajo.md) | Instalación, los cinco modos, el cierre y la ficha de requerimiento |
 | [06 · Settings y modos](docs/06-settings-y-modos.md) | Permisos, modos (`Shift+Tab`), estilos de salida |
 
 ## Publicar un cambio

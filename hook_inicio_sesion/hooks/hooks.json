@@ -6,6 +6,7 @@
         "hooks": [
           {
             "type": "command",
+            "shell": "bash",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}\"/scripts/inicio-sesion.sh",
             "timeout": 60
           }

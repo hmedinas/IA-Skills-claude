@@ -6,7 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash init.sh",
+            "shell": "bash",
+            "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/init.sh\"",
             "timeout": 60
           }
         ]
