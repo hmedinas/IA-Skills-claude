@@ -75,7 +75,14 @@ if [ "$MODO" = privado ]; then
     avi "la raíz no es repo: el arnés de la raíz ya queda fuera de git"
   else
     vis=0; lista=""
-    for f in CLAUDE.md AGENTS.md progress.md Resumen.md init.sh .claude plan-implementacion-*.md \
+    # Si el equipo ya versiona archivos en .claude/, la instalación solo excluyó los del arnés:
+    # se comprueban esos y no la carpeta entera (si no, saldría un falso "visible para git").
+    if [ -n "$(git ls-files -- .claude | head -1)" ]; then
+      CLAUDE_ARNES=".claude/agents/implementador.md .claude/agents/revisor.md .claude/settings.local.json"
+    else
+      CLAUDE_ARNES=".claude"
+    fi
+    for f in CLAUDE.md AGENTS.md progress.md Resumen.md init.sh $CLAUDE_ARNES plan-implementacion-*.md \
              "$MEMORIA_DST" "$FICHAS_BORRADORES" "$ADR_BORRADORES"; do
       [ -n "$f" ] && [ -e "$f" ] || continue
       [ "$f" = "$FICHAS_DIR" ] || [ "$f" = "$ADR_DIR" ] && continue
