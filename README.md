@@ -4,6 +4,7 @@ Marketplace personal de componentes para [Claude Code](https://claude.com/claude
 Cada componente es un plugin que se instala por separado. Las guías de cómo se crea e instala cada tipo están en [`docs/`](docs/README.md).
 
 ## Instalar
+Manual completo, paso a paso: [docs/00-instalacion.md](docs/00-instalacion.md).
 
 ```
 claude plugin marketplace add hmedinas/IA-Skills-claude     # una vez
@@ -32,6 +33,7 @@ claude plugin install <componente>@ia-skills-claude
 ## Guías
 | Guía | Contenido |
 |---|---|
+| [00 · Manual de instalación](docs/00-instalacion.md) | Paso a paso: requisitos, marketplace, arnés, comprobar, actualizar y desinstalar |
 | [Índice y mapa](docs/README.md) | Qué es cada componente y cuál necesitas |
 | [01 · Skills y comandos](docs/01-skills-y-comandos.md) | `SKILL.md`, cabecera, `$ARGUMENTS`, instalación |
 | [02 · Agentes](docs/02-agentes.md) | Subagentes: rol, modelo, herramientas |

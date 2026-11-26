@@ -1,6 +1,6 @@
 {
   "name": "hook_inicio_sesion",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Hook SessionStart: si el proyecto tiene init.sh lo ejecuta al abrir, retomar o compactar la sesión y su salida entra como contexto.",
   "author": {
     "name": "Hugo Medina"

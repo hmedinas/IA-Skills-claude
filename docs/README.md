@@ -4,6 +4,8 @@
 > **qué es · cuándo usarlo · dónde vive · cómo se crea · ejemplo real · cómo se instala · errores típicos**.
 > Verificado contra la documentación oficial (Claude Code 2.1.x, noviembre 2026).
 
+**¿Empiezas de cero?** Sigue el [manual de instalación paso a paso](00-instalacion.md).
+
 ## Mapa rápido
 
 | Componente | Qué es, en una frase | Dónde vive | Guía |
@@ -14,6 +16,7 @@
 | **MCP** | Un programa que le da a Claude herramientas nuevas (tu BD, Jira, Azure DevOps…) | Proceso aparte, registrado en `.mcp.json` | [04](04-mcp.md) |
 | **Plugin** | Un paquete con skills, agentes, hooks y MCP, que se instala de una vez | Repo con `.claude-plugin/` | [05](05-plugins-y-marketplace.md) |
 | **Settings y modos** | Permisos, modo de trabajo (pedir permiso, editar solo, solo planificar) y estilo de respuesta | `settings.json`, `Shift+Tab` | [06](06-settings-y-modos.md) |
+| **Instalación** | Manual paso a paso: requisitos, marketplace, arnés, comprobar, actualizar y desinstalar | Tu equipo y tu proyecto | [00](00-instalacion.md) |
 | **Arnés de trabajo** | La skill `arnes_trabajo`: instalación, modo privado para repos compartidos, los cinco modos, el cierre y las fichas | Tu proyecto (`AGENTS.md`, `init.sh`, `doc/fichas/`…) | [07](07-arnes-trabajo.md) |
 
 ## ¿Cuál necesito?

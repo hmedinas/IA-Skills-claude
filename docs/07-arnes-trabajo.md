@@ -33,6 +33,8 @@ Se instala en uno de dos modos:
 - Proyectos con base de datos de solo lectura, varios repos o una raíz sin git.
 
 ## Instalación completa
+Paso a paso, con comprobaciones y solución de problemas: [00 · Manual de instalación](00-instalacion.md). En resumen:
+
 Requisitos: Claude Code y **bash** (en Windows, Git Bash, que viene con Git for Windows).
 
 ```bash
